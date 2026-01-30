@@ -18,13 +18,49 @@ import {
   Clock,
   Award,
   Users,
-  Heart
+  Heart,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react'
 import './App.css'
+
+const carouselSlides = [
+  {
+    id: 1,
+    title: 'Modern Kitchen Design',
+    subtitle: 'Sleek countertops & custom cabinets',
+    gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+  },
+  {
+    id: 2,
+    title: 'Elegant Countertops',
+    subtitle: 'Granite, quartz & marble installations',
+    gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
+  },
+  {
+    id: 3,
+    title: 'Custom Cabinetry',
+    subtitle: 'Built to fit your space perfectly',
+    gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)'
+  },
+  {
+    id: 4,
+    title: 'Beautiful Backsplashes',
+    subtitle: 'Tile work that transforms your kitchen',
+    gradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)'
+  },
+  {
+    id: 5,
+    title: 'Complete Renovations',
+    subtitle: 'From design to installation',
+    gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)'
+  }
+]
 
 function App() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [currentSlide, setCurrentSlide] = useState(0)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -33,6 +69,21 @@ function App() {
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % carouselSlides.length)
+    }, 4000)
+    return () => clearInterval(timer)
+  }, [])
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % carouselSlides.length)
+  }
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + carouselSlides.length) % carouselSlides.length)
+  }
 
   const fadeInUp = {
     initial: { opacity: 0, y: 40 },
@@ -55,6 +106,7 @@ function App() {
         <div className="container">
           <a href="#" className="logo">
             HA <span>Kitchens</span>
+            <span className="logo-tagline">Kitchen Installations</span>
           </a>
           <ul className="nav-links">
             <li><a href="#about">About</a></li>
@@ -151,10 +203,39 @@ function App() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <div className="hero-image-container">
-              <div className="hero-image-main">
-                <ChefHat size={80} />
-                <span>Your Dream Kitchen Awaits</span>
+            <div className="hero-carousel">
+              <div className="carousel-container">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={currentSlide}
+                    className="carousel-slide"
+                    style={{ background: carouselSlides[currentSlide].gradient }}
+                    initial={{ opacity: 0, x: 100 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -100 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <div className="carousel-content">
+                      <h3>{carouselSlides[currentSlide].title}</h3>
+                      <p>{carouselSlides[currentSlide].subtitle}</p>
+                    </div>
+                  </motion.div>
+                </AnimatePresence>
+                <button className="carousel-btn carousel-btn-prev" onClick={prevSlide}>
+                  <ChevronLeft size={24} />
+                </button>
+                <button className="carousel-btn carousel-btn-next" onClick={nextSlide}>
+                  <ChevronRight size={24} />
+                </button>
+              </div>
+              <div className="carousel-dots">
+                {carouselSlides.map((_, index) => (
+                  <button
+                    key={index}
+                    className={`carousel-dot ${index === currentSlide ? 'active' : ''}`}
+                    onClick={() => setCurrentSlide(index)}
+                  />
+                ))}
               </div>
               <motion.div
                 className="hero-accent-box"
@@ -472,6 +553,7 @@ function App() {
             <div className="footer-brand">
               <a href="#" className="logo">
                 HA <span>Kitchens</span>
+                <span className="logo-tagline">Kitchen Installations</span>
               </a>
               <p>
                 Your trusted partner for kitchen installations and remodeling
